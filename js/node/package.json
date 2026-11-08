@@ -1,9 +1,9 @@
 {
   "name": "@rabolic/node",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Rabolic server SDK for Node.js: server-side events, verified revenue and checkout metadata.",
   "license": "MIT",
-  "homepage": "https://rabolic.com",
+  "homepage": "https://github.com/rabolic/sdks/tree/main/js/node#readme",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/rabolic/sdks.git",

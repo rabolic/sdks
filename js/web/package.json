@@ -1,9 +1,9 @@
 {
   "name": "@rabolic/web",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Rabolic product analytics for the browser: page views, SPA routes, page leave, campaigns, consent.",
   "license": "MIT",
-  "homepage": "https://rabolic.com",
+  "homepage": "https://github.com/rabolic/sdks/tree/main/js/web#readme",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/rabolic/sdks.git",

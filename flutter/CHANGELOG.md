@@ -1,3 +1,9 @@
+## 0.1.1
+
+- The package page links to the GitHub repository instead of rabolic.com,
+  which has no site yet.
+- First release published from GitHub Actions.
+
 ## 0.1.0
 
 First release.

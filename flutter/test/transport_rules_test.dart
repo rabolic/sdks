@@ -7,6 +7,7 @@ import 'package:rabolic_flutter/rabolic_flutter.dart';
 import 'package:rabolic_flutter/src/platform.dart';
 import 'package:rabolic_flutter/src/storage/key_value_store.dart';
 import 'package:rabolic_flutter/src/storage/queue_store.dart';
+import 'package:rabolic_flutter/src/version.dart';
 
 import 'support/harness.dart';
 
@@ -402,8 +403,8 @@ void main() {
         expect(request.headers['Content-Encoding'], isNull);
         expect(request.json.containsKey('key'), isFalse);
         expect(request.json['library'], <String, Object?>{
-          'name': 'rabolic-flutter',
-          'version': '0.1.0',
+          'name': libraryName,
+          'version': libraryVersion,
         });
 
         h.client.track('large', properties: {'text': 'y' * 2000});
