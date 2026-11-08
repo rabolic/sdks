@@ -1,0 +1,15 @@
+.DS_Store
+*.log
+
+# JavaScript
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+*.tgz
+
+# Flutter / Dart
+.dart_tool/
+build/
+pubspec.lock
+.flutter-plugins-dependencies

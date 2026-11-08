@@ -1,0 +1,41 @@
+{
+  "name": "@rabolic/sdk-core",
+  "version": "0.1.0",
+  "description": "Platform-agnostic core of the Rabolic JavaScript SDKs: ids, queue, batching, retry, sessions, consent and remote config. Bundled into @rabolic/web and @rabolic/node; not published on its own.",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "@rabolic/source": "./src/index.ts",
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "typecheck": "tsc -p tsconfig.json && tsc -p tsconfig.test.json",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@rabolic/test-utils": "workspace:*"
+  },
+  "private": true
+}

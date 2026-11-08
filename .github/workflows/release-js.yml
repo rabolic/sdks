@@ -1,0 +1,61 @@
+# Publishes @rabolic/web and @rabolic/node when a js-vX.Y.Z tag is pushed.
+# npm trusted publishing: npm checks this workflow's OIDC identity, so the
+# repository stores no npm token, and every release carries provenance.
+name: Release JS
+
+on:
+  push:
+    tags: ['js-v[0-9]+.[0-9]+.[0-9]+*']
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: npm
+    defaults:
+      run:
+        working-directory: js
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+        with:
+          package_json_file: js/package.json
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+      # Trusted publishing needs npm 11.5.1 or later.
+      - run: npm install --global npm@^11.5.1
+      - run: pnpm install --frozen-lockfile
+
+      - name: Check the tag matches the package versions
+        run: |
+          version="${GITHUB_REF_NAME#js-v}"
+          for pkg in web node; do
+            actual=$(node -p "require('./$pkg/package.json').version")
+            [ "$actual" = "$version" ] || { echo "::error::$pkg/package.json is $actual, the tag is $version"; exit 1; }
+          done
+
+      - run: pnpm -r typecheck
+      - run: pnpm -r test
+      - run: pnpm -r build
+
+      # pnpm pack rewrites workspace: ranges; npm publishes the tarball with OIDC.
+      # A version already on npm is skipped, so a failed run can be re-run.
+      - name: Publish
+        run: |
+          version="${GITHUB_REF_NAME#js-v}"
+          for pkg in web node; do
+            name="@rabolic/$pkg"
+            if npm view "$name@$version" version >/dev/null 2>&1; then
+              echo "$name@$version is already published"
+              continue
+            fi
+            (cd "$pkg" && pnpm pack --pack-destination "$RUNNER_TEMP")
+            npm publish "$RUNNER_TEMP/rabolic-$pkg-$version.tgz" --access public
+          done
