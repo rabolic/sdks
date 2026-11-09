@@ -1,0 +1,53 @@
+{
+  "name": "rabolic",
+  "version": "0.1.2",
+  "description": "Set up Rabolic analytics in your project: npx rabolic init.",
+  "license": "MIT",
+  "homepage": "https://github.com/rabolic/sdks/tree/main/js/cli#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rabolic/sdks.git",
+    "directory": "js/cli"
+  },
+  "bugs": {
+    "url": "https://github.com/rabolic/sdks/issues"
+  },
+  "keywords": [
+    "analytics",
+    "product-analytics",
+    "rabolic",
+    "cli"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "type": "module",
+  "bin": {
+    "rabolic": "./dist/cli.js"
+  },
+  "exports": {
+    ".": {
+      "@rabolic/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "typecheck": "tsc -p tsconfig.json && tsc -p tsconfig.test.json",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@rabolic/test-utils": "workspace:*"
+  }
+}

@@ -9,6 +9,10 @@ protocol in [`spec/`](spec/).
 | [`@rabolic/web`](https://www.npmjs.com/package/@rabolic/web) | Browsers: npm or a `<script>` tag | `npm i @rabolic/web` | [`js/web`](js/web) |
 | [`@rabolic/node`](https://www.npmjs.com/package/@rabolic/node) | Node.js servers | `npm i @rabolic/node` | [`js/node`](js/node) |
 | [`rabolic_flutter`](https://pub.dev/packages/rabolic_flutter) | Flutter: iOS, Android, web | `flutter pub add rabolic_flutter` | [`flutter`](flutter) |
+| [`rabolic`](https://www.npmjs.com/package/rabolic) | Setup CLI for all of the above | `npx rabolic init` | [`js/cli`](js/cli) |
+
+The quickest start: run `npx rabolic init` in your project. It installs the right SDK, adds one
+file, sets the key and sends a test event ([details](js/cli)).
 
 Script tag for websites. Replace the key with your project's publishable key:
 
@@ -23,7 +27,8 @@ recorded from servers, with `@rabolic/node` or Dodo Payments webhooks.
 
 ```
 spec/       the ingest protocol and the JSON Schema every SDK is tested against
-js/         pnpm workspace: web, node, the shared core (bundled into both) and test utils
+js/         pnpm workspace: web, node, the shared core (bundled into both), the setup CLI
+            (cli, and create-rabolic for `npm create rabolic`) and test utils
 flutter/    the Flutter package and an example app
 ```
 
@@ -53,7 +58,7 @@ Pushing a tag publishes a release from GitHub Actions:
 
 | Tag | Publishes |
 |---|---|
-| `js-v1.2.3` | `@rabolic/web` and `@rabolic/node` at 1.2.3. Both `package.json` versions must already say 1.2.3. The web `<script>` build goes to `cdn.rabolic.com/v1/1.2.3/rabolic.js` and, unless it is a pre-release, to `/v1/rabolic.js` |
+| `js-v1.2.3` | `@rabolic/web`, `@rabolic/node`, `rabolic` (the CLI) and `create-rabolic`, all at 1.2.3. Every `package.json` and `src/version.ts` must already say 1.2.3; a version already on npm is skipped. The web `<script>` build goes to `cdn.rabolic.com/v1/1.2.3/rabolic.js` and, unless it is a pre-release, to `/v1/rabolic.js` |
 | `flutter-v1.2.3` | `rabolic_flutter` 1.2.3. `pubspec.yaml` and `CHANGELOG.md` must already say 1.2.3 |
 
 ## Security

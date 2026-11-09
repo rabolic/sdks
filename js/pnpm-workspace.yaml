@@ -2,4 +2,6 @@ packages:
   - core
   - web
   - node
+  - cli
+  - create-rabolic
   - test-utils

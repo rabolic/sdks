@@ -1,0 +1,42 @@
+{
+  "name": "create-rabolic",
+  "version": "0.1.2",
+  "description": "npm create rabolic: set up Rabolic analytics in your project (runs rabolic init).",
+  "license": "MIT",
+  "homepage": "https://github.com/rabolic/sdks/tree/main/js/cli#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rabolic/sdks.git",
+    "directory": "js/create-rabolic"
+  },
+  "bugs": {
+    "url": "https://github.com/rabolic/sdks/issues"
+  },
+  "keywords": [
+    "analytics",
+    "rabolic",
+    "create"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "type": "module",
+  "bin": {
+    "create-rabolic": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "rabolic": "workspace:^"
+  }
+}
