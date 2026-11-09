@@ -36,6 +36,12 @@ await rabolic.shutdown()
 | `shutdown()` | Stops the timer and sends everything, skipping any backoff wait. Idempotent; later events are dropped |
 | `checkoutMetadata({ userId?, anonymousId? })` | `{ rabolic_user_id?, rabolic_anonymous_id? }` for Dodo Payments checkout metadata, so the payment webhook links the revenue to the person. Other providers aren't supported yet. Also a standalone export |
 
+**One revenue source per project.** If the project has Dodo Payments connected in Rabolic,
+its webhooks are the revenue: `purchase()`, `renewal()` and `refund()` are still recorded as
+events (funnels and journeys use them) but add no revenue, so a payment never counts twice.
+Use them as the revenue source for any other provider. With Dodo, pass `checkoutMetadata()`
+to the checkout instead.
+
 Every event needs `userId` or `anonymousId`. With only `userId`, it is also sent as the
 `anonymous_id` (the protocol requires one), so it must then be at most 128 characters; the server
 treats it as a user without a device id. Calls never throw or reject; invalid ones are dropped and, with `debug: true`, logged.
