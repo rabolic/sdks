@@ -59,3 +59,59 @@ jobs:
             (cd "$pkg" && pnpm pack --pack-destination "$RUNNER_TEMP")
             npm publish "$RUNNER_TEMP/rabolic-$pkg-$version.tgz" --access public
           done
+
+  # Puts the <script> build of @rabolic/web on cdn.rabolic.com (Cloudflare R2
+  # bucket rabolic-cdn). The file comes from the npm tarball, checked against
+  # the registry's integrity, so the CDN serves exactly what npm has.
+  # The R2 token in the cdn environment can write to that bucket only.
+  cdn:
+    needs: publish
+    runs-on: ubuntu-latest
+    environment: cdn
+    permissions:
+      contents: read
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: auto
+      AWS_REQUEST_CHECKSUM_CALCULATION: when_required
+      AWS_RESPONSE_CHECKSUM_VALIDATION: when_required
+      R2_ENDPOINT: ${{ vars.R2_ENDPOINT }}
+    steps:
+      - name: Fetch the published script
+        run: |
+          version="${GITHUB_REF_NAME#js-v}"
+          # A new version can take a few minutes to appear on the registry.
+          for _ in $(seq 1 30); do
+            meta=$(curl -fsS "https://registry.npmjs.org/@rabolic/web/$version") && break
+            sleep 10
+          done
+          [ -n "${meta:-}" ] || { echo "::error::@rabolic/web@$version is not on the registry"; exit 1; }
+          curl -fsS -o web.tgz "$(jq -r .dist.tarball <<<"$meta")"
+          actual="sha512-$(openssl dgst -sha512 -binary web.tgz | base64 -w0)"
+          [ "$actual" = "$(jq -r .dist.integrity <<<"$meta")" ] || { echo "::error::tarball integrity mismatch"; exit 1; }
+          tar -xzf web.tgz package/dist/rabolic.global.js
+
+      # v1/<version>/rabolic.js never changes. v1/rabolic.js is what the
+      # snippet loads; a pre-release (1.2.0-beta.1) leaves it alone.
+      - name: Upload to R2
+        run: |
+          version="${GITHUB_REF_NAME#js-v}"
+          put() {
+            aws s3 cp package/dist/rabolic.global.js "s3://rabolic-cdn/$1" \
+              --endpoint-url "$R2_ENDPOINT" --only-show-errors \
+              --content-type 'application/javascript; charset=utf-8' --cache-control "$2"
+            echo "uploaded https://cdn.rabolic.com/$1"
+          }
+          put "v1/$version/rabolic.js" 'public, max-age=31536000, immutable'
+          case "$version" in
+            *-*) echo "pre-release: v1/rabolic.js stays on the previous release" ;;
+            *) put v1/rabolic.js 'public, max-age=3600' ;;
+          esac
+
+      - name: Check the CDN serves it
+        run: |
+          version="${GITHUB_REF_NAME#js-v}"
+          expected=$(sha256sum < package/dist/rabolic.global.js)
+          actual=$(curl -fsS "https://cdn.rabolic.com/v1/$version/rabolic.js" | sha256sum)
+          [ "$actual" = "$expected" ] || { echo "::error::cdn.rabolic.com/v1/$version/rabolic.js differs from the npm build"; exit 1; }

@@ -45,13 +45,14 @@ every SDK in the same pull request.
 
 ## Releases
 
-Pushing a tag publishes a release from GitHub Actions, without stored tokens:
-- npm uses trusted publishing with provenance;
-- pub.dev uses automated publishing.
+Pushing a tag publishes a release from GitHub Actions:
+- npm uses trusted publishing with provenance; no token is stored.
+- pub.dev uses automated publishing; no token is stored.
+- `cdn.rabolic.com` is a Cloudflare R2 bucket. It is written with an R2 token that can only write to that bucket, kept in the `cdn` environment.
 
 | Tag | Publishes |
 |---|---|
-| `js-v1.2.3` | `@rabolic/web` and `@rabolic/node` at 1.2.3. Both `package.json` versions must already say 1.2.3 |
+| `js-v1.2.3` | `@rabolic/web` and `@rabolic/node` at 1.2.3. Both `package.json` versions must already say 1.2.3. The web `<script>` build goes to `cdn.rabolic.com/v1/1.2.3/rabolic.js` and, unless it is a pre-release, to `/v1/rabolic.js` |
 | `flutter-v1.2.3` | `rabolic_flutter` 1.2.3. `pubspec.yaml` and `CHANGELOG.md` must already say 1.2.3 |
 
 ## Security
