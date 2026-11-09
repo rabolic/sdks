@@ -80,7 +80,7 @@ The CDN file is `dist/rabolic.global.js` from this package.
 | `optOut()` / `optIn()` | `setConsent('denied')` / `setConsent('granted')` |
 | `flush()` | Sends the queue now. Never rejects |
 | `getAnonymousId()` | The anonymous id, or `null` before `init` |
-| `appLink(url)` | Adds `rb_aid=<anonymous id>` to a store or deep link, so the app can link the visitor (needs consent) |
+| `appLink(url)` | Adds `rb_aid=<anonymous id>` to a store or deep link (needs consent). The app SDK reports it in `$deep_link`; the server stores it but doesn't link the visitor to the app user yet, so use `identify` on both sides |
 
 No method throws into your page. Pass `debug: true` to see why a call was dropped.
 
@@ -99,8 +99,10 @@ No method throws into your page. Pass `debug: true` to see why a call was droppe
 | `flushAt` | `20` | Send when this many events are queued (1–500) |
 | `flushIntervalMs` | `5000` | Send at least this often |
 
-Remote config from your project settings can turn tracking off, block events, sample devices,
-change the session timeout and switch automatic page views and page leaves off.
+At start the SDK fetches remote config (`GET /v1/config`, cached for 5 minutes). Today it sets the
+session timeout from your project settings. The protocol also lets it turn tracking off, block
+events, sample devices and switch automatic page views and page leaves off, and the SDK honors those
+fields, but no project setting controls them yet.
 
 ## Automatic behaviour
 
@@ -114,7 +116,7 @@ change the session timeout and switch automatic page views and page leaves off.
 - **Campaigns:** `utm_*` and the click id type (`gclid`, `fbclid`, `ttclid`, `msclkid`) from the
   landing URL go in `context.campaign`. A landing with different parameters starts a new session.
 - **Sessions:** shared across tabs through `localStorage`; a new one after 30 minutes without
-  events (or the remote `sessionTimeoutWebMin`), and on `reset()`.
+  events (or the project's web session timeout), and on `reset()`.
 - **Context:** `platform: 'web'`, locale, time zone, screen size and density, page URL, path,
   title and referrer, and the user agent.
 - **Requests:** `text/plain` with the key in the body and no credentials, so the browser sends no

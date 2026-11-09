@@ -16,7 +16,8 @@ Script tag for websites. Replace the key with your project's publishable key:
 <script async src="https://cdn.rabolic.com/v1/rabolic.js" data-key="rb_pub_…"></script>
 ```
 
-Each package's README covers its options, consent, identity and revenue.
+Each package's README covers its options, consent and identity. Revenue is
+recorded from servers, with `@rabolic/node` or Dodo Payments webhooks.
 
 ## Repository layout
 

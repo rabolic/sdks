@@ -7,7 +7,8 @@ Product analytics for Flutter apps, from [Rabolic](https://rabolic.com).
 - Events survive restarts and offline periods in a persisted queue. They are
   sent in batches with retry and backoff.
 - Sessions, app lifecycle events, screen tracking for Navigator, go_router
-  and auto_route, deep-link attribution and in-app-purchase linking.
+  and auto_route, deep links with campaign parameters, and an account token
+  for in-app purchases.
 - Consent states, no advertising ids and no fingerprinting.
 
 ## Install
@@ -102,15 +103,17 @@ RabolicConfig(
 )
 ```
 
-The project's settings in Rabolic are fetched from `GET /v1/config` at start.
-They are cached on the device and refreshed when the app returns to the
-foreground and the cache is more than 5 minutes old. Tracking never waits for
-them. These settings can:
-- turn the project off (`enabled: false` stops sending and clears the queue);
-- change the session timeouts;
-- turn lifecycle events off;
-- block event names;
-- sample devices (`sampleRate`). Sampling is stable per device.
+Remote config is fetched from `GET /v1/config` at start. It is cached on the
+device and refreshed when the app returns to the foreground and the cache is
+more than 5 minutes old. Tracking never waits for it.
+
+Today the server sets only the session timeouts there, from your project
+settings. The protocol has more fields, and the SDK honors them, but no
+project setting controls them yet:
+- `enabled: false` stops sending and clears the queue;
+- `autocapture.lifecycle: false` turns lifecycle events off;
+- `blockedEvents` drops those event names;
+- `sampleRate` samples devices, stably per device.
 
 ### Automatic events
 
@@ -118,7 +121,7 @@ On iOS and Android, with `trackLifecycle: true`:
 
 | Event | When | Properties |
 |---|---|---|
-| `$app_first_open` | First launch after install | |
+| `$app_first_open` | First launch after install | None |
 | `$app_update` | First launch on a new app version | `previous_version` |
 | `$app_open` | Launch, and every return to the foreground | `from_background` |
 | `$app_background` | The app leaves the foreground | `foreground_ms` |
@@ -200,9 +203,13 @@ final purchase = PurchaseParam(
 await InAppPurchase.instance.buyNonConsumable(purchaseParam: purchase);
 ```
 
-The App Store returns it as `appAccountToken` and Google Play as
-`obfuscatedAccountId`. Rabolic reads it from the store's transaction data and
-uses it to link verified purchases to the person.
+The App Store stores it as the transaction's `appAccountToken` and Google
+Play as `obfuscatedAccountId`.
+
+Rabolic doesn't receive App Store or Google Play transactions yet, so it
+can't link store purchases to the person from this token today. To record
+revenue now, report verified purchases from your server with
+[`@rabolic/node`](../js/node)'s `purchase`, `renewal` and `refund`.
 
 - The token is created by `identify`.
 - It is kept across launches.
@@ -210,8 +217,8 @@ uses it to link verified purchases to the person.
 - `reset()` clears it.
 - It is `null` until someone is identified, so call `identify` before the
   purchase.
-- It is also sent as the `app_account_token` trait on `$identify`, which is
-  how Rabolic knows whose token it is.
+- It is also sent as the `app_account_token` trait on `$identify`, so the
+  person's traits hold it.
 
 ## Deep links
 
@@ -224,9 +231,10 @@ AppLinks().uriLinkStream.listen(Rabolic.handleDeepLink);
 
 The SDK sends `$deep_link` with:
 - `url`;
-- `linked_anonymous_id`, from the link's `rb_aid` parameter. The web SDK's
-  `appLink()` adds it, and Rabolic uses it to join the web visitor to the app
-  user;
+- `linked_anonymous_id`, from the link's `rb_aid` parameter, which the web
+  SDK's `appLink()` adds. Rabolic stores it but doesn't join the web visitor
+  to the app user from it yet; `identify` with the same user id on web and app
+  does;
 - `context.campaign`, from `utm_source`, `utm_medium`, `utm_campaign`,
   `utm_content`, `utm_term` and the click ids (`gclid`, `fbclid`, `ttclid`,
   `msclkid`).
@@ -300,10 +308,10 @@ their data; delete the person in Rabolic.
 |---|---|
 | Event name | 1–200 characters |
 | Properties | 255 keys per level, nesting depth 5, keys up to 255 characters |
-| Serialized event | 32 KB. Larger events are dropped |
+| Serialized event | 32 KB. Larger events are dropped. The server rejects events over 32,000 characters |
 | User id | 1–255 characters |
 | Queue | 10,000 events on iOS and Android, 1,000 on the web. When it is full, the oldest events are dropped |
-| Event age | Events older than 7 days are dropped before sending |
+| Event age | Events older than 7 days are dropped before sending. The server also rejects events older than 30 days and corrects device clocks that are off by more than 30 s |
 | Batch | 500 events or 900 KB. Bodies over 1 KB are gzipped (not on the web) |
 | Requests | One at a time, 10 s timeout. Backoff from 1 s to 5 min with jitter. `Retry-After` is honored |
 

@@ -48,7 +48,7 @@ export interface RabolicWeb {
   flush(): Promise<void>
   /** `null` before `init`. */
   getAnonymousId(): string | null
-  /** Adds `rb_aid=<anonymous id>` to a store or deep link URL, so the app can link the two visitors. */
+  /** Adds `rb_aid=<anonymous id>` to a store or deep link URL. The app SDK reports it in `$deep_link`; the server doesn't link the two visitors from it yet. */
   appLink(url: string): string
 }
 

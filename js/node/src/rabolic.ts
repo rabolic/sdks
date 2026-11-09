@@ -63,7 +63,7 @@ export interface RevenueInput extends PersonIds {
   idempotencyKey?: string
 }
 
-/** Metadata to attach to a Stripe or Dodo checkout session, so the payment links to the person. */
+/** Metadata to attach to a Dodo Payments checkout session, so the payment links to the person. Other providers aren't supported yet. */
 export interface CheckoutMetadata {
   rabolic_user_id?: string
   rabolic_anonymous_id?: string
@@ -250,7 +250,7 @@ export class Rabolic {
   }
 }
 
-/** Builds `{ rabolic_user_id, rabolic_anonymous_id }` for Stripe or Dodo checkout metadata, leaving out what is not set. */
+/** Builds `{ rabolic_user_id, rabolic_anonymous_id }` for Dodo Payments checkout metadata, leaving out what is not set. */
 export function checkoutMetadata(ids: PersonIds): CheckoutMetadata {
   const metadata: CheckoutMetadata = {}
   if (!idProblem(ids?.userId, 'userId', MAX_USER_ID_LENGTH)) metadata.rabolic_user_id = ids.userId

@@ -132,8 +132,9 @@ class RabolicClient {
   ///
   /// Pass it as `applicationUserName` in `in_app_purchase`'s
   /// `PurchaseParam`; it becomes StoreKit's `appAccountToken` and Play's
-  /// `obfuscatedAccountId`, which lets Rabolic link store transactions to the
-  /// person. It is created by [identify], kept across launches, replaced
+  /// `obfuscatedAccountId`. Rabolic doesn't receive store transactions yet,
+  /// so it doesn't link store purchases to the person from this token
+  /// today. It is created by [identify], kept across launches, replaced
   /// when a different user is identified and cleared by [reset]. `null`
   /// until someone is identified.
   String? get appAccountToken => _isReady ? _identity.appAccountToken : null;
@@ -185,8 +186,8 @@ class RabolicClient {
   /// Sets the user id on this and every later event, and sends
   /// `$identify` with [traits] (person properties).
   ///
-  /// The `$identify` traits also carry `app_account_token`, so Rabolic can
-  /// link App Store and Play purchases made with [appAccountToken].
+  /// The `$identify` traits also carry `app_account_token`, the person's
+  /// [appAccountToken].
   void identify(String userId, {Map<String, Object?>? traits}) {
     _call('identify', (now) {
       if (userId.isEmpty || userId.runes.length > Limits.userId) {
@@ -259,7 +260,8 @@ class RabolicClient {
   /// Sends `$deep_link` for an incoming link.
   ///
   /// A `rb_aid` parameter (added by the web SDK's `appLink`) becomes
-  /// `linked_anonymous_id`, which links the web visitor to this app user.
+  /// `linked_anonymous_id`. The server stores it but doesn't link the web
+  /// visitor to this app user from it yet.
   /// utm and click-id parameters become `context.campaign`. The full URL is
   /// sent as the `url` property, so strip secrets (login tokens) first.
   void handleDeepLink(Uri uri) {
