@@ -36,7 +36,6 @@ export function keyKindFor(framework: Framework): KeyKind {
 
 /** Why the CLI can't set up this project, or null when it can. */
 export function unsupported(framework: Framework): string | null {
-  if (framework === 'react-native') return 'The React Native SDK (@rabolic/react-native) is not released yet. Until it is, send events from your server with @rabolic/node or the ingest API.'
   if (framework === 'unknown') return 'No package.json, pubspec.yaml or index.html here. Run this in your project folder, or see https://rabolic.com/sdks for every SDK.'
   return null
 }
@@ -150,6 +149,37 @@ module.exports = { rabolic }
         ],
         env: { file: '.env', name: 'RABOLIC_SECRET_KEY', value: key },
         next: [`Import rabolic from ${file} where you track server events or purchases. Load .env in production your usual way; the key is a secret.`],
+      }
+    }
+    case 'react-native': {
+      const file = join(p.srcDir, `rabolic.${ext}`)
+      const packages = ['@rabolic/react-native', '@react-native-async-storage/async-storage']
+      const keyExpr = p.expo ? `process.env.EXPO_PUBLIC_RABOLIC_KEY${p.typescript ? '!' : ''}` : `'${key}'`
+      const next = p.expo?.router
+        ? [`At the top of app/_layout.${p.typescript ? 'tsx' : 'jsx'}, add: import '${relativeImport('app/_layout.tsx', file)}'`,
+           `For screens, in the same layout: const ref = useNavigationContainerRef() (from expo-router), then useEffect(() => rabolic.trackNavigation(ref), [ref]).`]
+        : [`At the top of your entry file (index.js or App.${p.typescript ? 'tsx' : 'js'}), add: import '${relativeImport('index.js', file)}'`,
+           'For screens, pass your NavigationContainer ref: <NavigationContainer ref={ref} onReady={() => rabolic.trackNavigation(ref)}>.']
+      if (!p.expo) next.push('Then run cd ios && pod install, for AsyncStorage.')
+      return {
+        keyKind: 'publishable',
+        // Expo picks the AsyncStorage version that matches the SDK.
+        install: p.expo ? { command: 'npx', args: ['expo', 'install', ...packages] } : { ...installCommand(pm, packages[0]!), args: [...installCommand(pm, packages[0]!).args, packages[1]!] },
+        files: [
+          {
+            path: file,
+            contents: `import { rabolic } from '@rabolic/react-native'
+
+// Starts Rabolic once, at app start. Calls made before it finishes are kept.
+void rabolic.init({ projectKey: ${keyExpr}${host ? `, host: '${host}'` : ''} })
+
+export { rabolic }
+`,
+          },
+        ],
+        // A publishable key is public; bare React Native has no env files, so it is written in the file.
+        env: p.expo ? { file: '.env', name: 'EXPO_PUBLIC_RABOLIC_KEY', value: key } : null,
+        next,
       }
     }
     case 'flutter':

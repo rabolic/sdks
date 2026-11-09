@@ -20,6 +20,8 @@ export interface Project {
   appDir: string | null
   /** package.json says "type": "module". */
   esm: boolean
+  /** React Native through Expo (expo-router, when `router` is true). */
+  expo?: { router: boolean }
 }
 
 interface PackageJson {
@@ -54,7 +56,8 @@ export function detectProject(dir: string): Project {
     return { dir, framework: 'nuxt', packageManager, typescript: true, srcDir: has(dir, 'app') ? 'app' : '', appDir: null, esm: false }
   }
   if ('react-native' in deps || 'expo' in deps) {
-    return { dir, framework: 'react-native', packageManager, typescript, srcDir: src, appDir: null, esm }
+    const expo = 'expo' in deps ? { router: 'expo-router' in deps } : undefined
+    return { dir, framework: 'react-native', packageManager, typescript, srcDir: src, appDir: null, esm, ...(expo ? { expo } : {}) }
   }
   if ('vite' in deps) {
     return { dir, framework: 'vite', packageManager, typescript, srcDir: src, appDir: null, esm }

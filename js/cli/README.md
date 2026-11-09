@@ -23,10 +23,10 @@ never overwrites a file or an env value that is already there.
 | Nuxt | `@rabolic/web` | `plugins/rabolic.client.ts` | `NUXT_PUBLIC_RABOLIC_KEY` in `.env` |
 | Vite (React, Vue, Svelte, …) | `@rabolic/web` | `src/rabolic.ts` | `VITE_RABOLIC_KEY` in `.env.local` |
 | Node.js server | `@rabolic/node` | `src/rabolic.ts` | `RABOLIC_SECRET_KEY` in `.env` |
+| Expo | `@rabolic/react-native` and AsyncStorage, with `npx expo install` | `rabolic.ts` | `EXPO_PUBLIC_RABOLIC_KEY` in `.env` |
+| React Native (bare) | `@rabolic/react-native` and AsyncStorage | `src/rabolic.ts`, with the publishable key in it | none |
 | Flutter | `rabolic_flutter` | none: prints the `Rabolic.init` call for `main.dart` | none |
 | Static site (`index.html`) | none | none: prints the `<script>` tag | none |
-
-React Native isn't supported yet: `@rabolic/react-native` is coming.
 
 Sites and apps use the project's **publishable key** (`rb_pub_…`). A server uses a **secret key**
 (`rb_live_…` or `rb_test_…`), which can send revenue and must never ship in a browser or an app.

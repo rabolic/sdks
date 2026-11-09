@@ -8,6 +8,7 @@ protocol in [`spec/`](spec/).
 |---|---|---|---|
 | [`@rabolic/web`](https://www.npmjs.com/package/@rabolic/web) | Browsers: npm or a `<script>` tag | `npm i @rabolic/web` | [`js/web`](js/web) |
 | [`@rabolic/node`](https://www.npmjs.com/package/@rabolic/node) | Node.js servers | `npm i @rabolic/node` | [`js/node`](js/node) |
+| [`@rabolic/react-native`](https://www.npmjs.com/package/@rabolic/react-native) | React Native and Expo: iOS, Android | `npx expo install @rabolic/react-native @react-native-async-storage/async-storage` | [`js/react-native`](js/react-native) |
 | [`rabolic_flutter`](https://pub.dev/packages/rabolic_flutter) | Flutter: iOS, Android, web | `flutter pub add rabolic_flutter` | [`flutter`](flutter) |
 | [`rabolic`](https://www.npmjs.com/package/rabolic) | Setup CLI for all of the above | `npx rabolic init` | [`js/cli`](js/cli) |
 
@@ -27,7 +28,7 @@ recorded from servers, with `@rabolic/node` or Dodo Payments webhooks.
 
 ```
 spec/       the ingest protocol and the JSON Schema every SDK is tested against
-js/         pnpm workspace: web, node, the shared core (bundled into both), the setup CLI
+js/         pnpm workspace: web, node, react-native, the shared core (bundled into each), the setup CLI
             (cli, and create-rabolic for `npm create rabolic`) and test utils
 flutter/    the Flutter package and an example app
 ```
@@ -58,7 +59,7 @@ Pushing a tag publishes a release from GitHub Actions:
 
 | Tag | Publishes |
 |---|---|
-| `js-v1.2.3` | `@rabolic/web`, `@rabolic/node`, `rabolic` (the CLI) and `create-rabolic`, all at 1.2.3. Every `package.json` and `src/version.ts` must already say 1.2.3; a version already on npm is skipped. The web `<script>` build goes to `cdn.rabolic.com/v1/1.2.3/rabolic.js` and, unless it is a pre-release, to `/v1/rabolic.js` |
+| `js-v1.2.3` | `@rabolic/web`, `@rabolic/node`, `@rabolic/react-native`, `rabolic` (the CLI) and `create-rabolic`, all at 1.2.3. Every `package.json` and `src/version.ts` must already say 1.2.3; a version already on npm is skipped. The web `<script>` build goes to `cdn.rabolic.com/v1/1.2.3/rabolic.js` and, unless it is a pre-release, to `/v1/rabolic.js` |
 | `flutter-v1.2.3` | `rabolic_flutter` 1.2.3. `pubspec.yaml` and `CHANGELOG.md` must already say 1.2.3 |
 
 ## Security

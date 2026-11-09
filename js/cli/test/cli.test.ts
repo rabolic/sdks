@@ -75,6 +75,22 @@ describe('planSetup', () => {
     expect(html.next[0]).toContain(`data-key="${PUB}"`)
   })
 
+  it('React Native: Expo installs through expo install and uses EXPO_PUBLIC_, bare React Native writes the key and needs pods', () => {
+    const expo = planSetup(detectProject(project({ 'package.json': pkg({ expo: '54', 'expo-router': '6', 'react-native': '0.81' }), 'tsconfig.json': '{}', 'app/_layout.tsx': '' })), PUB)
+    expect(expo.install).toEqual({ command: 'npx', args: ['expo', 'install', '@rabolic/react-native', '@react-native-async-storage/async-storage'] })
+    expect(expo.files[0]).toMatchObject({ path: 'rabolic.ts' })
+    expect(expo.files[0]!.contents).toContain('void rabolic.init({ projectKey: process.env.EXPO_PUBLIC_RABOLIC_KEY! })')
+    expect(expo.env).toEqual({ file: '.env', name: 'EXPO_PUBLIC_RABOLIC_KEY', value: PUB })
+    expect(expo.next[0]).toBe("At the top of app/_layout.tsx, add: import '../rabolic'")
+    expect(expo.next[1]).toContain('useNavigationContainerRef()')
+
+    const bare = planSetup(detectProject(project({ 'package.json': pkg({ 'react-native': '0.81' }), 'yarn.lock': '', 'src/App.js': '' })), PUB)
+    expect(bare.install).toEqual({ command: 'yarn', args: ['add', '@rabolic/react-native', '@react-native-async-storage/async-storage'] })
+    expect(bare.files[0]!.contents).toContain(`projectKey: '${PUB}'`)
+    expect(bare.env).toBeNull()
+    expect(bare.next.at(-1)).toContain('pod install')
+  })
+
   it('relative imports', () => {
     expect(relativeImport('src/main.ts', 'src/rabolic.ts')).toBe('./rabolic')
     expect(relativeImport('main.ts', 'rabolic.ts')).toBe('./rabolic')
@@ -149,10 +165,10 @@ describe('rabolic init and check', () => {
     expect(existsSync(join(dir, 'rabolic.js'))).toBe(false)
   })
 
-  it('says why React Native and empty folders are not set up', async () => {
-    const rn = io(project({ 'package.json': pkg({ 'react-native': '0.81' }) }))
-    expect(await run(['init'], rn.io)).toBe(1)
-    expect(rn.lines[0]).toContain('not released yet')
+  it('says why an empty folder is not set up', async () => {
+    const empty = io(project({}))
+    expect(await run(['init'], empty.io)).toBe(1)
+    expect(empty.lines[0]).toContain('No package.json, pubspec.yaml or index.html here')
   })
 
   it('check reports refused keys and rejected events', async () => {

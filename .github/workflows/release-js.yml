@@ -1,5 +1,6 @@
 # Publishes the JS packages when a js-vX.Y.Z tag is pushed: @rabolic/web,
-# @rabolic/node, rabolic (the CLI) and create-rabolic, all at the tag's version.
+# @rabolic/node, @rabolic/react-native, rabolic (the CLI) and create-rabolic,
+# all at the tag's version.
 # npm trusted publishing: npm checks this workflow's OIDC identity, so the
 # repository stores no npm token, and every release carries provenance.
 name: Release JS
@@ -37,7 +38,7 @@ jobs:
       - name: Check the tag matches the package versions
         run: |
           version="${GITHUB_REF_NAME#js-v}"
-          for pkg in web node cli create-rabolic; do
+          for pkg in web node react-native cli create-rabolic; do
             actual=$(node -p "require('./$pkg/package.json').version")
             [ "$actual" = "$version" ] || { echo "::error::$pkg/package.json is $actual, the tag is $version"; exit 1; }
             # The version the code reports (src/version.ts) must match too.
@@ -56,7 +57,7 @@ jobs:
         run: |
           version="${GITHUB_REF_NAME#js-v}"
           # In dependency order: create-rabolic depends on rabolic.
-          for pkg in web node cli create-rabolic; do
+          for pkg in web node react-native cli create-rabolic; do
             name=$(node -p "require('./$pkg/package.json').name")
             if npm view "$name@$version" version >/dev/null 2>&1; then
               echo "$name@$version is already published"

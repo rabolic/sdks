@@ -2,6 +2,7 @@ packages:
   - core
   - web
   - node
+  - react-native
   - cli
   - create-rabolic
   - test-utils
