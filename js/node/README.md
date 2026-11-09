@@ -74,7 +74,7 @@ Timers are unref'd, so the SDK never keeps your process alive; call `shutdown()`
 
 - The key is sent only in the `Authorization` header and never logged.
 - Properties are copied safely (`__proto__`, `constructor` and `prototype` keys are dropped) and
-  capped at 255 keys per level and depth 5. Events over 32 KB are dropped; the server rejects
-  events over 32,000 characters.
+  capped at 255 keys per level and depth 5. Events over 32 KB (32,768 bytes of UTF-8 JSON) are
+  dropped; the server applies the same limit.
 - Server events carry no `context.platform`; the server assigns the person's last client platform
   from the past 24 hours, else `server`.

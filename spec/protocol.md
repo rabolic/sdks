@@ -75,7 +75,7 @@ Rejection reasons in `rejected` (stable strings):
 | `reserved_name` | A `$` name that isn't in §3 |
 | `revenue_needs_secret_key` | `$purchase`, `$renewal` or `$refund` sent with a publishable key |
 | `too_old` | The event is more than 30 days old, after clock correction (§2) |
-| `too_large` | The serialized event is longer than 32,000 characters |
+| `too_large` | The serialized event is larger than 32 KB (32,768 bytes of UTF-8 JSON) |
 | `blocked_event` | Reserved. The server doesn't return it yet |
 
 ## 2. Batch envelope
@@ -112,8 +112,9 @@ Rejection reasons in `rejected` (stable strings):
 | `traits` | object | no | `identify` only: person properties to set |
 | `context` | object | no | Below |
 
-The serialized event may be at most 32,000 characters; longer ones are
-rejected with `too_large`.
+The serialized event may be at most 32 KB: 32,768 bytes of the event's JSON
+encoded as UTF-8, counted in bytes, not characters. SDKs drop larger events
+before sending; the server rejects them with `too_large`.
 
 The server removes these property and trait keys without rejecting the event:
 - keys longer than 255 characters;

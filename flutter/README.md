@@ -308,7 +308,7 @@ their data; delete the person in Rabolic.
 |---|---|
 | Event name | 1–200 characters |
 | Properties | 255 keys per level, nesting depth 5, keys up to 255 characters |
-| Serialized event | 32 KB. Larger events are dropped. The server rejects events over 32,000 characters |
+| Serialized event | 32 KB (32,768 bytes of UTF-8 JSON). Larger events are dropped; the server applies the same limit |
 | User id | 1–255 characters |
 | Queue | 10,000 events on iOS and Android, 1,000 on the web. When it is full, the oldest events are dropped |
 | Event age | Events older than 7 days are dropped before sending. The server also rejects events older than 30 days and corrects device clocks that are off by more than 30 s |
