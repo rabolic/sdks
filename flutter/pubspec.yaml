@@ -2,7 +2,7 @@ name: rabolic_flutter
 description: >-
   Rabolic product analytics for Flutter. Pure Dart SDK for iOS, Android and
   web with a persisted queue, sessions, lifecycle events and screen tracking.
-version: 0.1.1
+version: 0.1.2
 repository: https://github.com/rabolic/sdks/tree/main/flutter
 issue_tracker: https://github.com/rabolic/sdks/issues
 topics:
@@ -21,11 +21,11 @@ platforms:
   web:
 
 dependencies:
-  device_info_plus: ^13.1.0
+  device_info_plus: ">=11.0.0 <14.0.0"
   flutter:
     sdk: flutter
   http: ^1.2.0
-  package_info_plus: ^10.1.0
+  package_info_plus: ">=8.3.0 <11.0.0"
   path_provider: ^2.1.5
   shared_preferences: ^2.5.0
 

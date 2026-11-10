@@ -52,3 +52,9 @@ jobs:
       - run: flutter pub get
       - run: flutter analyze
       - run: flutter test
+      - name: Test at the lowest supported plugin versions
+        run: |
+          printf '\ndependency_overrides:\n  device_info_plus: 11.0.0\n  package_info_plus: 8.3.0\n' >> pubspec.yaml
+          flutter pub get
+          flutter analyze
+          flutter test

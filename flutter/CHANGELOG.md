@@ -1,3 +1,9 @@
+## 0.1.2
+
+- Accepts `device_info_plus` 11 to 13 and `package_info_plus` 8.3 to 10, so
+  apps still on `package_info_plus` 8 or 9 (and `win32` 5) can add the SDK.
+  CI tests both ends of the ranges.
+
 ## 0.1.1
 
 - The package page links to the GitHub repository instead of rabolic.com,
