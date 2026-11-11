@@ -1,6 +1,6 @@
 {
   "name": "@rabolic/react-native",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Rabolic product analytics for React Native and Expo: app lifecycle, sessions, screens, identity and deep links.",
   "license": "MIT",
   "homepage": "https://github.com/rabolic/sdks/tree/main/js/react-native#readme",

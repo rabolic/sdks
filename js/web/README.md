@@ -92,7 +92,7 @@ No method throws into your page. Pass `debug: true` to see why a call was droppe
 | `host` | `https://ingest.rabolic.com` | For a first-party proxy or self-hosting |
 | `trackRoutes` | `true` | `$pageview` on SPA navigation (`pushState`, `replaceState`, `popstate`) |
 | `trackPageLeave` | `true` | `$page_leave` with `active_ms` and `scroll_depth` |
-| `persistence` | `'localStorage'` | `'memory'`: cookieless, ids last one page lifetime |
+| `persistence` | `'localStorage'` | `'memory'`: cookieless, nothing on the device; the server counts each visitor per day |
 | `cookieDomain` | current host | Such as `.example.com`, to share `rb_aid` across subdomains |
 | `consent` | `'granted'` | `'pending'` until your cookie banner answers |
 | `debug` | `false` | Log every call |
@@ -131,4 +131,9 @@ fields, but no project setting controls them yet.
 - `consent: 'pending'` writes no cookie and nothing to storage and sends nothing; events wait in
   memory until `setConsent('granted')`. `denied` drops the queue and removes everything stored,
   cookie included.
+- `persistence: 'memory'` (cookieless) writes no cookie and nothing to storage. Events are marked
+  `cookieless` and carry no session id: the server counts the visitor as a hash of a daily salt,
+  the project, the IP address and the user agent, starts sessions after 30 minutes without
+  activity, and deletes each day's salt, so a visitor can't be followed to the next day.
+  `identify()` still links the visitor to your user id.
 - Secret keys (`rb_live_`, `rb_test_`) are refused in the browser.

@@ -1,6 +1,6 @@
 {
   "name": "create-rabolic",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "npm create rabolic: set up Rabolic analytics in your project (runs rabolic init).",
   "license": "MIT",
   "homepage": "https://github.com/rabolic/sdks/tree/main/js/cli#readme",

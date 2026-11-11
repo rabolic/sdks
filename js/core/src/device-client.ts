@@ -53,6 +53,12 @@ export interface DeviceClientOptions {
   maxQueueSize: number
   /** Session timeout for the current remote config. */
   sessionTimeoutMs: (config: RemoteConfig) => number
+  /**
+   * Cookieless mode (protocol §4): ids live only in memory, so events go out
+   * marked `cookieless` and without a session id; the server derives the
+   * visitor and the session.
+   */
+  serverIdentity?: boolean
   /** Platform context for an event created now. */
   getContext: () => EventContext
   keyPlacement: 'header' | 'body'
@@ -212,10 +218,10 @@ export function createDeviceClient(options: DeviceClientOptions): DeviceClient {
         timestampMs: now,
         anonymousId,
         userId,
-        sessionId: session.touch(now),
+        sessionId: options.serverIdentity ? undefined : session.touch(now),
         properties: isIdentify ? undefined : sanitizeProperties(mergeProperties(superProperties, input.properties), report),
         traits: isIdentify ? sanitizeProperties(input.traits, report) : undefined,
-        context: { ...options.getContext(), ...input.context, platform: options.platform },
+        context: { ...options.getContext(), ...input.context, platform: options.platform, ...(options.serverIdentity ? { cookieless: true } : {}) },
       })
       if (serializedSize(event) > MAX_EVENT_BYTES) return drop(`over ${MAX_EVENT_BYTES} bytes`)
 

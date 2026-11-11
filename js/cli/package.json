@@ -1,6 +1,6 @@
 {
   "name": "rabolic",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Set up Rabolic analytics in your project: npx rabolic init.",
   "license": "MIT",
   "homepage": "https://github.com/rabolic/sdks/tree/main/js/cli#readme",

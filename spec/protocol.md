@@ -159,6 +159,9 @@ The server removes these property and trait keys without rejecting the event:
   platform from the past 24 hours, else `server`.
 - Web SDKs don't need to send `browser` or `os`: the server parses
   `user_agent`, or the request's `User-Agent` header when it is missing.
+  When a publishable key sends a web event, the browser sent the request
+  itself, so the server also reads its `Sec-CH-UA` header: Brave, and
+  DuckDuckGo on Windows, are named only there.
 
 ## 3. Event names
 
@@ -189,6 +192,8 @@ Any other `$` name is rejected with `reserved_name`.
 **`anonymous_id`**
 - A UUIDv4, generated on first use and persisted:
   - web: `localStorage` key `rb_aid`, mirrored to a first-party cookie `rb_aid`;
+  - web in cookieless mode: memory only; the server replaces it with the day's
+    visitor id (§7);
   - apps: local storage.
 - `reset()` replaces it.
 - Every event carries one; the schema requires it. Server SDKs send the
@@ -290,7 +295,15 @@ Consent:
 - `consent: 'denied'` drops everything and clears the queue.
 - `setConsent()` changes the state at runtime.
 - Web only: `persistence: 'memory'` (cookieless mode) keeps ids in memory
-  only, for one page lifetime.
+  only, for one page lifetime, and writes nothing to the device. Its events
+  carry `context.cookieless: true` and no `session_id`. For those events,
+  sent with a publishable key, the server replaces `anonymous_id` with the
+  day's visitor id, `ck_` and 32 hex characters of
+  `sha256(salt, project id, IP address, user agent)`. The salt is random,
+  made for each UTC day and deleted after two days, so a visitor is the same
+  through a day and can't be linked to the next. The server starts their
+  sessions (30 minutes without activity), and `identify()` still links the
+  visitor to a user id.
 
 The server doesn't store IP addresses with events. It uses them for geo
 lookup, the project's internal-traffic ranges and per-IP rate limits (a

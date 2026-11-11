@@ -54,6 +54,11 @@ export interface EventContext {
   campaign?: CampaignContext
   screen_name?: string
   user_agent?: string
+  /**
+   * Cookieless mode (protocol §4): nothing is kept on the device, so the
+   * server derives the visitor from a daily hash and starts the sessions.
+   */
+  cookieless?: boolean
 }
 
 export interface WireEvent {

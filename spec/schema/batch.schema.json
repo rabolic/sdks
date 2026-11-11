@@ -103,7 +103,8 @@
               }
             },
             "screen_name": { "type": "string", "maxLength": 256 },
-            "user_agent": { "type": "string", "maxLength": 1024 }
+            "user_agent": { "type": "string", "maxLength": 1024 },
+            "cookieless": { "type": "boolean" }
           }
         }
       }

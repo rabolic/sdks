@@ -108,6 +108,8 @@ export function createRabolic(environment: WebEnvironment = {}): RabolicWeb {
       flushIntervalMs: options.flushIntervalMs,
       maxQueueSize: WEB_MAX_QUEUE,
       sessionTimeoutMs: (config) => config.sessionTimeoutWebMin * 60_000,
+      // Nothing persists in cookieless mode: the server counts the visitor per day and starts sessions.
+      serverIdentity: options.persistence === 'memory',
       getContext: () => ({ ...fixed, page: tracker?.currentPage(), campaign: landing?.context }),
       keyPlacement: 'body',
       clock,

@@ -252,12 +252,29 @@ describe('anonymous id, cookie and storage', () => {
 
   it("persistence: 'memory' writes no cookie and nothing to localStorage", async () => {
     page = openPage()
-    const { sdk } = startSdk(page, { persistence: 'memory' })
+    const { sdk, fake } = startSdk(page, { persistence: 'memory' })
     sdk.track('a')
     sdk.register({ plan: 'pro' })
     expect(page.win.localStorage.length).toBe(0)
     expect(page.cookieWrites).toHaveLength(0)
     expect(sdk.getAnonymousId()).toBeTruthy()
+    // The server counts the visitor per day and starts sessions: events say so and carry no session id.
+    await sdk.flush()
+    const events = sentEvents(fake) as Array<Record<string, any>>
+    expect(events.map((event) => [event.event, event.context.cookieless, event.session_id])).toEqual([
+      ['$pageview', true, undefined],
+      ['a', true, undefined],
+    ])
+    for (const batch of fake.batches) assertValidBatch(batch)
+  })
+
+  it('marks nothing cookieless with the default persistence', async () => {
+    page = openPage()
+    const { sdk, fake } = startSdk(page)
+    sdk.track('a')
+    await sdk.flush()
+    const events = sentEvents(fake) as Array<Record<string, any>>
+    expect(events.every((event) => event.context.cookieless === undefined && typeof event.session_id === 'string')).toBe(true)
   })
 
   it('falls back to memory when localStorage throws', async () => {
